@@ -1,0 +1,31 @@
+name: Upload Podcast to Hosting Service
+
+on:
+  push:
+    branches:
+      - main  # This will trigger the action when changes are pushed to the main branch
+
+jobs:
+  fetch-and-upload:
+    runs-on: ubuntu-latest
+    
+    steps:
+    - name: Checkout the repository
+      uses: actions/checkout@v2
+
+    - name: Set up Node.js
+      uses: actions/setup-node@v2
+      with:
+        node-version: '14'
+
+    - name: Install dependencies
+      run: npm install
+
+    - name: Fetch Audio from Google Drive
+      run: |
+        npm install googleapis
+        node fetchAudio.js  # This will run the script to fetch the audio
+
+    - name: Upload Audio to AWS S3
+      run: |
+        aws s3 cp ./audio-file.mp3 s3://your-bucket-name/path/to/audio-file.mp3 --acl public-read
